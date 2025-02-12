@@ -1,0 +1,319 @@
+<!-- <script lang="ts" setup>
+import { watch } from "vue";
+import AnimationAi from "@/components/animations/AnimationBot1.vue";
+import { useAuthStore } from "@/stores/authStore";
+import { useLocale } from "vuetify/lib/framework.mjs";
+import { useSnackbarStore } from "@/stores/snackbarStore";
+import { IListRequest } from "@/api/types/base";
+import taskAPI from "@/api/task";
+import AIProxyAPI from "@/api/aiproxy";
+import MJTaskItem from "./MJTaskItem.vue";
+import TaskPublishForm from "./TaskPublishForm.vue";
+
+const { showErrorMessage, showSuccessMessage } = useSnackbarStore()
+const { finishTask, consum, consumCheck } = useAuthStore()
+const { task } = storeToRefs(useAuthStore())
+const { t } = useLocale()
+
+/** 监听新任务派发 */
+let updateTasksTimeoutId
+watch(task, (val, oldVal) => {
+    if (!val) return
+    updateTasksTimeoutId = setTimeout(() => {
+        const taskIndex = myTasks.value.findIndex(item => item.id === val.id)
+        if (taskIndex >= 0) myTasks.value[taskIndex] = val
+
+        if (val.status === 255 && (val.type.indexOf('FLUX') === 0 || val.type.indexOf('MJ') === 0 || val.type.indexOf('WORKFLOW') === 0)) {
+            fetch(val);
+        }
+        finishTask();
+    }, 1000)
+})
+
+/** 任务列表 */
+const myTasks = ref<ITask<any, any>[]>([])
+const total = ref(-1)
+const scrollContainerRef = ref()
+const listQuery = reactive<IListRequest & {
+    method: string
+    status: number
+}>({
+    idx: 1,
+    size: 10,
+    method: "",
+    status: -1,
+});
+const load = async ({ done }) => {
+    if (myTasks.value.length >= total.value && total.value >= 0) {
+        done('empty')
+        return
+    }
+    taskAPI.myTasksApi(listQuery).then((result) => {
+        myTasks.value = myTasks.value?.concat(result.data)
+        total.value = result.total
+        listQuery.idx++
+        const lastTask = myTasks.value[0]
+        fetch(lastTask)
+        done('ok')
+    }).catch((err) => {
+    });
+}
+
+const add = (task: ITask<any, any>) => {
+    myTasks.value.unshift(task);
+    // 自动滚动到最新内容
+    nextTick(() => {
+        if (scrollContainerRef.value) {
+            scrollContainerRef.value.$el.scrollTop = scrollContainerRef.value.$el.scrollHeight;
+        }
+    });
+}
+const cancel = async (id: string) => {
+    const { data } = await taskAPI.cancel({ id })
+    const findIndex = myTasks.value.findIndex(x => x.id === id)
+    myTasks.value[findIndex] = data
+}
+const retry = async (id: string, replace: boolean) => {
+    if (replace) {
+        const findIndex = myTasks.value.findIndex(x => x.id === id)
+        myTasks.value.splice(findIndex, 1)
+    }
+    const { data } = await taskAPI.retry({ id, replace })
+    add(data);
+}
+
+const fetching = ref("")
+const fetch = async (task: ITask<any, any>) => {
+    if (task.type.indexOf('MJ') === 0) {
+        if (task.result?.cdnImage || task.result?.progress?.indexOf('100') === 0) return
+        const jobId = task.result.urls?.get || task.result.jobId || task.result.result || task.result.id 
+        if (jobId) {
+            fetching.value = task.id
+            const timeObj = setTimeout(async () => {
+                const { data } = await AIProxyAPI.fetch({ taskId: task.id, type: task.type, jobId })
+                const taskIndex = myTasks.value.findIndex(item => item.id === task.id)
+                if (taskIndex >= 0) {
+                    myTasks.value[taskIndex].status = data.status
+                    myTasks.value[taskIndex].result = data.result
+                }
+                if (data.result && data.result.progress?.indexOf('100') === 0) {
+                    if (taskIndex >= 0) myTasks.value[taskIndex] = data
+                    clearTimeout(timeObj)
+                    fetching.value = ""
+                    return
+                }
+                if (data.status === 254) {
+                    clearTimeout(timeObj)
+                    fetching.value = ""
+                    return
+                }
+                await fetch(task)
+            }, 5000);
+        }
+    }
+
+    if(task.type.indexOf("WORKFLOW")===0){
+        if (task.result?.images?.length > 0 || task.result?.percentCompleted?.indexOf('100') === 0) return
+        const jobId = task.result.id
+        fetching.value = task.id
+        const timeObj = setTimeout(async () => {
+            const { data } = await AIProxyAPI.WF_fetch({ taskId: task.id, type: task.type, jobId: `${jobId}` })
+            const taskIndex = myTasks.value.findIndex(item => item.id === task.id)
+            if (taskIndex >= 0) {
+                myTasks.value[taskIndex].status = data.status
+                myTasks.value[taskIndex].result = data.result
+            }
+            if (data.result && data.result?.percentCompleted && data.result?.percentCompleted?.toString().indexOf('100') === 0) {
+                if (taskIndex >= 0) myTasks.value[taskIndex] = data
+                clearTimeout(timeObj)
+                fetching.value = ""
+                return
+            }
+            if (data.status === 254) {
+                clearTimeout(timeObj)
+                fetching.value = ""
+                return
+            }
+            await fetch(task)
+        }, 5000);
+    }
+}
+const emits = defineEmits(["onPaint"])
+const action = async (task: any, action: string, title?: string) => {
+    const llA = action.toLowerCase()
+    if (llA.indexOf("inpaint") >= 0) {
+        emits("onPaint", task, action, title)
+        return
+    }
+    const actionParmas = {
+        jobId: task.result?.jobId,
+        model: task.params?.model,
+        taskId: task.result.id,
+        action,
+    }
+    const { data } = await AIProxyAPI.MJ_submit({
+        method: "action",
+        params: actionParmas,
+        title: `${task.title}::${title}`,
+        type: task.type
+    })
+    const findIndex = myTasks.value.findIndex(x => x.id === data.id)
+    myTasks.value.splice(findIndex, 1)
+    myTasks.value.unshift(data);
+    // 自动滚动到最新内容
+    nextTick(() => {
+        if (scrollContainerRef.value) {
+            scrollContainerRef.value.$el.scrollTop = scrollContainerRef.value.$el.scrollHeight;
+        }
+    });
+}
+
+const preiewTask = ref<ITask<any, any>>()
+const previewDialog = ref(false)
+const previewSrc = ref('')
+const openPreviewDialog = (task: ITask<any, any>, img?: string) => {
+    preiewTask.value = task
+    if (img) previewSrc.value = img
+    else previewSrc.value = (task?.result?.url || task?.result?.imageUrl || task?.result?.cdnImage)
+    previewDialog.value = true
+}
+
+defineExpose({
+    add,
+    cancel
+})
+</script>
+
+<template>
+    <v-dialog v-model="previewDialog" height="100%" close-on-back>
+        <v-card class="mx-auto" width="100%" height="100%">
+            <v-card-text class="flex overflow-hidden" width="100%" height="100%">
+                <v-row>
+                    <v-col cols="3" md="2"
+                        v-if="preiewTask?.params.mask || preiewTask?.params.imgBase64Array?.length > 0">
+                        <v-img class="mb-2 border-sm" width="120px" height="120px" v-if="preiewTask?.params.base64"
+                            :src="preiewTask?.params.base64"></v-img>
+                        <v-img class="mb-2 border-sm" width="120px" height="120px" v-if="preiewTask?.params.mask"
+                            :src="preiewTask?.params.mask"></v-img>
+                        <v-img class="mb-2 border-sm" width="120px" height="120px"
+                            v-for="item in preiewTask?.params.imgBase64Array" :src="item"></v-img>
+                    </v-col>
+                    <v-col style="height: 100%;" class="flex align-center justify-center flex-wrap">
+                        <img style="max-height: 100%;" :src="previewSrc" alt="" />
+                        <v-card-text v-if="preiewTask?.result?.prompt" style="width: 100%;">
+                            {{ preiewTask?.result?.prompt }}
+                        </v-card-text>
+                    </v-col>
+                </v-row>
+            </v-card-text>
+        </v-card>
+    </v-dialog>
+    <v-card class="h-full" max-width="750px">
+        <v-infinite-scroll class="task-list" ref="scrollContainerRef" color="secondary" side="end"
+            height="calc(100vh - 124px)" @load="load" :empty-text="$t('$vuetify.infiniteScroll.empty')"
+            :load-more-text="$t('$vuetify.infiniteScroll.loading')">
+            <div v-for="row in myTasks" class="generate-container">
+                <v-card-text>
+                    <v-label>id: {{ row.id }}</v-label>
+                    <v-label class="font-weight-medium my-3 flex flex-wrap">
+                        <div class="mr-3" color="primary">{{ row.title }}</div>
+                        <v-chip size="small" v-if="row.status === 0" color="primary">
+                            状态：排队等待中
+                        </v-chip>
+                        <v-chip size="small" v-else-if="row.status === 1 || fetching === row.id" color="secondary">
+                            状态：执行中 {{ row.result?.progress?.replace("%", "") || row.result?.percentCompleted || 0 }}%
+                        </v-chip>
+                        <v-chip size="small" v-else-if="row.status === 254" color="red">
+                            状态：已失败
+                        </v-chip>
+                        <v-chip size="small" v-else-if="row.status === 255 && fetching != row.id" color="green">
+                            状态：已完成
+                        </v-chip>
+                    </v-label>
+                    <div v-if="row.status > 0" class="mx-l">
+                        <AnimationAi v-if="(fetching === row.id || row.status <= 1) && !row.result?.imageUrl" :size="300" />
+                        <v-img v-if="(fetching === row.id || row.status <= 1) && row.result?.imageUrl" width="100%"
+                            :src="row.result.imageUrl">
+                            <template v-slot:placeholder>
+                                <AnimationAi :size="300" />
+                            </template>
+                        </v-img>
+                        <div class="position-relative flex flex-wrap"
+                            v-if="fetching != row.id && row.status === 255 && (row.result?.images || row.result?.url || row.result?.imageUrl || row.result?.cdnImage)">
+                            <v-img aspect-ratio="1:1" v-for="imgSrc in row.result?.images"
+                                @click.prevent="openPreviewDialog(row, (imgSrc?.url || imgSrc?.previewPath || imgSrc))" width="50%"
+                                v-if="row.result?.images?.length > 0" :src="imgSrc?.url || imgSrc?.previewPath || imgSrc">
+                                <template v-slot:placeholder>
+                                    <div class="d-flex align-center justify-center fill-height">
+                                        <v-progress-circular color="grey-lighten-4" indeterminate></v-progress-circular>
+                                    </div>
+                                </template>
+                                <template v-if="imgSrc.title" v-slot:default>
+                                    <v-chip size="x-small" class="rounded-0 text-color-white" color="error" variant="tonal"> {{  imgSrc.title  }}</v-chip>
+                                </template>
+                            </v-img>
+                            <v-img aspect-ratio="1:1" v-else width="100%" @click.prevent="openPreviewDialog(row)"
+                                :src="row.result?.url || row.result?.imageUrl || row.result?.cdnImage">
+                                <template v-slot:placeholder>
+                                    <div class="d-flex align-center justify-center fill-height">
+                                        <v-progress-circular color="grey-lighten-4" indeterminate></v-progress-circular>
+                                    </div>
+                                </template>
+                            </v-img>
+                        </div>
+                        <div
+                            v-if="fetching != row.id && row.status === 255 && row.method.indexOf('MJ_') === 0 && !row.result.progress">
+                            <v-btn @click="fetch(row)" prepend-icon="mdi-refresh">
+                                获取图片超时，点击刷新...</v-btn>
+                        </div>
+                    </div>
+                    <div v-if="row.status<0">
+                        <v-btn color="error" variant="flat">该任务已完成取消并退费...</v-btn>
+                    </div>
+                </v-card-text>
+                <template v-if="row.status === 254 || (row.status === 255 && !row.result)">
+                    <v-card-actions>
+                        <v-btn color="red" @click="retry(row.id, true)" variant="flat">重新提交此任务</v-btn>
+                        <v-btn color="green" @click="retry(row.id, false)" variant="flat">新建同参数任务</v-btn>
+                        <v-btn color="#000" @click="cancel(row.id)" variant="flat">取消任务并退费</v-btn>
+                    </v-card-actions>
+                </template>
+                <template v-if="row.result?.buttons||row.result?.components">
+                    <v-card-actions class="d-flex flex-wrap" v-if="row.result?.components?.length > 0">
+                        <v-btn size="small" @click="action(row, btn, $t('toolkit.MJ.' + btn))"
+                            v-for="btn in row.result.components" class="text-none mb-4" color="primary" variant="flat">{{
+                                $t("toolkit.MJ." + btn) }} -50Y{{
+                                $t("system.coin") }}</v-btn>
+                    </v-card-actions>
+                    <v-card-actions class="d-flex flex-wrap" v-if="row.result?.buttons?.length > 0">
+                        <v-btn size="small"
+                            @click="action(row, btn.customId, $t(`toolkit.MJ.${btn.label.replace('.', '') || btn.emoji}`))"
+                            v-for="btn in row.result.buttons" class="text-none mb-4" color="primary" variant="flat">{{ btn.emoji
+                                +
+                                $t("toolkit.MJ." + (btn.label.replace(".", "") ||btn.emoji)) }} -50Y{{
+                                $t("system.coin") }}</v-btn>
+                    </v-card-actions>
+                </template>
+            </div>
+        </v-infinite-scroll>
+    </v-card>
+</template>
+
+<style scoped lang="scss">
+
+.task-list{
+    display: flex;
+    flex-direction: column-reverse;
+    max-width: 750px;
+    .generate-container{
+        max-width: 750px;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    .task-list{
+        flex-direction: column;
+        width: 100%;
+    }
+}
+</style> -->

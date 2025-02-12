@@ -1,0 +1,136 @@
+[
+    {
+        "workflowId": "1861606185081421825",
+        "nodeInfoList": [
+            {
+                "name": "场景参考图",
+                "nodeId": "237",
+                "fieldName": "image",
+                "fieldValue": ""
+            },
+            {
+                "name": "产品图",
+                "nodeId": "238",
+                "fieldName": "image",
+                "fieldValue": ""
+            }
+        ]
+    },
+    {
+        "workflowId": "1862025713334550530",
+        "nodeInfoList": [
+            {
+                "name": "空间线稿图",
+                "nodeId": "401",
+                "fieldName": "image",
+                "fieldValue": ""
+            },
+            {
+                "name": "主题元素",
+                "nodeId": "415",
+                "fieldName": "text",
+                "fieldValue": "室内设计，明亮，阳光充足，宽敞，高端配色，沙发，地毯，毯子，椅子，桌子，灯具"
+            },
+            {
+                "name": "画面",
+                "nodeId": "417",
+                "fieldName": "text",
+                "fieldValue": "高品质，原创绘画，原创，高品质，高分辨率，清晰，逼真，极端，杰作"
+            }
+        ]
+    },
+    {
+        "workflowId": "1862072785412534273",
+        "nodeInfoList": [
+            {
+                "name": "毛胚图",
+                "nodeId": "426",
+                "fieldName": "image",
+                "fieldValue": "https://img1.baidu.com/it/u=2195258758,3667677391&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1067"
+            },
+            {
+                "name": "风格参考图",
+                "nodeId": "425",
+                "fieldName": "image",
+                "fieldValue": "https://img2.baidu.com/it/u=3843348492,1896159666&fm=253&fmt=auto&app=138&f=JPEG?w=893&h=500"
+            },{
+                "name": "主题元素",
+                "nodeId": "429",
+                "fieldName": "text",
+                "fieldValue": "室内设计，明亮，阳光充足，宽敞，高端配色，沙发，地毯，毯子，椅子，桌子，灯具"
+            }
+        ]
+    },
+    {
+        "workflowId": "1862389038563962882",
+        "nodeInfoList": [
+            {
+                "name": "原空间图",
+                "nodeId": "397",
+                "fieldName": "image",
+                "fieldValue": "https://liblibai-online.liblib.cloud/img/657821e215b44634993b6864c6876f10/2c9e29241b5428655361da6b748fbcd0d854a7326627b5faa106545909fe9a8c.png"
+            },
+            {
+                "name": "主题元素",
+                "nodeId": "350",
+                "fieldName": "text",
+                "fieldValue": "室内设计，明亮，阳光充足，宽敞，高端配色，沙发，地毯，毯子，椅子，桌子，灯具"
+            }
+        ]
+    },{
+        "workflowId":"1862396549581176833",
+        "nodeInfoList": [
+            {
+                "name": "原空间图",
+                "nodeId": "251",
+                "fieldName": "image",
+                "fieldValue": "http://yorolook.com/upload/202112/10/thumb_202112101501147156.jpg"
+            },
+            {
+                "name": "风格参考图",
+                "nodeId": "253",
+                "fieldName": "image",
+                "fieldValue": "http://yorolook.com/upload/202112/08/thumb_202112081153148602.jpg"
+            }
+        ]
+    },{
+        "workflowId":"1863408798269636609",
+        "nodeInfoList": [
+            {
+                "name": "原空间图",
+                "nodeId": "88",
+                "fieldName": "image",
+                "fieldValue": "http://yorolook.com/upload/202112/10/thumb_202112101501147156.jpg"
+            },
+            {
+                "name": "风格参考图",
+                "nodeId": "89",
+                "fieldName": "image",
+                "fieldValue": "http://yorolook.com/upload/202112/08/thumb_202112081153148602.jpg"
+            }
+        ]
+    },{
+        "workflowId":"1864160221366255618",
+        "nodeInfoList": [
+            {
+                "name": "原图",
+                "nodeId": "201",
+                "fieldName": "image",
+                "fieldValue": "http://yorolook.com/upload/202207/28/202207281136314404.jpg"
+            },
+            {
+                "name": "材质贴图",
+                "nodeId": "202",
+                "fieldName": "image",
+                "fieldValue": "http://yorolook.com/upload/202307/07/202307071413386980.png"
+            },
+            {
+                "name": "主体描述（多主体下需要表明需要被更换的主体）",
+                "nodeId": "272",
+                "fieldName": "string",
+                "fieldValue": "茶几"
+            }
+        ],
+        "runtime": 240
+    }
+]

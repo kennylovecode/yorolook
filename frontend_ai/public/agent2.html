@@ -1,0 +1,106 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <!-- Do not delete start -->
+    <link rel="stylesheet" href="./main.css" />
+    <!-- Do not delete end -->
+  </head>
+  <body> 
+    <!-- <iframe style="width: 100vw; height: 100vh;" src="https://api.coze.cn/open-platform/sdk/chatapp?sender=chat-app-sdk-1733221079402&params=%7B%22chatClientId%22%3A%22zw3s8i-WPOTCYQei9e-uq%22%2C%22chatConfig%22%3A%7B%22bot_id%22%3A%227443760296349024295%22%2C%22conversation_id%22%3A%22JD4Yn4ovjvh3BhrXyno2F%22%7D%2C%22componentProps%22%3A%7B%22layout%22%3A%22pc%22%2C%22lang%22%3A%22en%22%2C%22title%22%3A%22%E9%AD%94%E6%96%B9%E8%AE%BE%E8%AE%A1%E5%8A%A9%E7%90%86%22%2C%22icon%22%3A%22https%3A%2F%2Flf-coze-web-cdn.coze.cn%2Fobj%2Fcoze-web-cn%2Fobric%2Fcoze%2Ffavicon.1970.png%22%2C%22uploadable%22%3Atrue%7D%7D"></iframe> -->
+    <div id="id1" style="top: 0; left: 0;width: 100vw; height: 100vh"></div>
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.0.0-beta.4/libs/cn/index.js"></script>
+    <script>
+
+const cozeWebSDK = new CozeWebSDK.WebChatClient({
+            config: {
+                bot_id: '7443760296349024295',
+            },
+            auth:  {
+                //鉴权方式，默认type 为unauth，表示不鉴权；建议设置为 token，表示通过PAT或OAuth鉴权
+                type: 'token',    
+                //type 为 token 时，需要设置PAT或OAuth访问密钥
+                token: 'pat_rWtXcHMNAVhBZmzjKsCRvbJvKcJDw9lb8zBCOzIdP1k9TD9DEHLvpwtKKPC2UVct',
+                //访问密钥过期时，使用的新密钥，可以按需设置。
+                onRefreshToken: () => 'pat_rWtXcHMNAVhBZmzjKsCRvbJvKcJDw9lb8zBCOzIdP1k9TD9DEHLvpwtKKPC2UVct',
+            },
+            componentProps: {
+                title: 'Coze',
+            },
+            ui: {
+                chatBot: {
+                    title: "YORO AI 超级智能体",
+                    width: 800,
+                },
+                base: {
+                    icon: 'https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png',
+                    layout: 'mobile',
+                    zIndex: 1000,
+                },
+                footer: {
+                    isShow: true,
+                    expressionText: 'Powered by {{name}}&{{name1}}',
+                    linkvars: {
+                        name: {
+                            text: 'YOROAI',
+                            link: 'https://ai.yorolook.com'
+                        },
+                        name1: {
+                            text: 'YOROLOOK',
+                            link: 'https://yorolook.com'
+                        }
+                        }
+                    }
+                },
+                asstBtn: {
+                    isNeed: false,
+                },
+            });
+        // const cozeWebSDK = new CozeWebSDK.WebChatClient({
+        //     config: {
+        //         // 智能体 ID
+        //         botId: '7437406737831444521',
+        //     },
+        //     auth:  {
+        //         //鉴权方式，默认type 为unauth，表示不鉴权；建议设置为 token，表示通过PAT或OAuth鉴权
+        //         type: 'token',    
+        //         //type 为 token 时，需要设置PAT或OAuth访问密钥
+        //         token: 'pat_rWtXcHMNAVhBZmzjKsCRvbJvKcJDw9lb8zBCOzIdP1k9TD9DEHLvpwtKKPC2UVct',
+        //         //访问密钥过期时，使用的新密钥，可以按需设置。
+        //         onRefreshToken: () => 'pat_rWtXcHMNAVhBZmzjKsCRvbJvKcJDw9lb8zBCOzIdP1k9TD9DEHLvpwtKKPC2UVct',
+        //     },
+        //     ui: {
+        //         chatBot: {
+        //             title: "YORO AI 超级智能体",
+        //             width: 800,
+        //         },
+        //         base: {
+        //             icon: 'https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png',
+        //             layout: 'pc',
+        //             zIndex: 1000,
+        //         },
+        //         footer: {
+        //             isShow: true,
+        //             expressionText: 'Powered by {{name}}&{{name1}}',
+        //             linkvars: {
+        //                 name: {
+        //                     text: 'YOROAI',
+        //                     link: 'https://ai.yorolook.com'
+        //                 },
+        //                 name1: {
+        //                     text: 'YOROLOOK',
+        //                     link: 'https://yorolook.com'
+        //                 }
+        //                 }
+        //             }
+        //         },
+        //         asstBtn: {
+        //             isNeed: false,
+        //         },
+        // });
+        cozeWebSDK.showChatBot()
+    </script>
+  </body>
+</html>

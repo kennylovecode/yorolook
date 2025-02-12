@@ -1,0 +1,74 @@
+[
+    {
+        "key": "nordic_style",
+        "image": "",
+        "name": "北欧风尚",
+        "description": "以简约、自然和功能性为核心，强调舒适和实用性。"
+    },
+    {
+        "key": "contemporary_minimalism",
+        "image": "",
+        "name": "当代简约",
+        "description": "强调简洁的线条和功能性，营造出一种清新而宁静的氛围。"
+    },
+    {
+        "key": "modern_american",
+        "image": "",
+        "name": "现代美式",
+        "description": "融合传统和现代元素，创造出舒适和实用的居住环境。"
+    },
+    {
+        "key": "contemporary_chinese",
+        "image": "",
+        "name": "当代中式",
+        "description": "结合传统中式风格与现代设计理念，体现文化传承与创新。"
+    },
+    {
+        "key": "contemporary_neoclassical",
+        "image": "",
+        "name": "当代新古典",
+        "description": "将古典美学与现代设计相结合，展现优雅与奢华。"
+    },
+    {
+        "key": "light_luxury",
+        "image": "",
+        "name": "轻奢时代",
+        "description": "强调高品质材料与简约设计，营造出低调奢华的生活方式。"
+    },
+    {
+        "key": "playful_fashion",
+        "image": "",
+        "name": "趣味时尚",
+        "description": "通过大胆的色彩和独特的图案，展示个性与创意。"
+    },
+    {
+        "key": "traditional_eastern",
+        "image": "",
+        "name": "传统东方",
+        "description": "体现东方文化的传统美学，注重细节与工艺。"
+    },
+    {
+        "key": "european_classical",
+        "image": "",
+        "name": "欧美古典",
+        "description": "融合欧洲古典风格的优雅与豪华，展现历史的深度。"
+    },
+    {
+        "key": "leisure_vacation",
+        "image": "",
+        "name": "休闲度假",
+        "description": "营造舒适和放松的环境，适合休闲和度假。"
+    },
+    {
+        "key": "japanese_style",
+        "image": "",
+        "name": "日式",
+        "description": "强调简约、自然和和谐，融合传统与现代的设计理念。"
+    },
+    {
+        "key": "eclectic",
+        "image": "",
+        "name": "混搭",
+        "description": "将不同风格和元素结合，创造独特的个性化空间。"
+    }
+]

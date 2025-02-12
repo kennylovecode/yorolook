@@ -1,0 +1,74 @@
+[
+    {
+        "key": "nordic_style",
+        "image": "",
+        "name": "北欧スタイル",
+        "description": "シンプルさ、自然、機能性に焦点を当て、快適さと実用性を強調します。"
+    },
+    {
+        "key": "contemporary_minimalism",
+        "image": "",
+        "name": "現代ミニマリズム",
+        "description": "クリーンなラインと機能性を強調し、フレッシュで静かな雰囲気を作り出します。"
+    },
+    {
+        "key": "modern_american",
+        "image": "",
+        "name": "現代アメリカン",
+        "description": "伝統と現代の要素を融合させ、快適で実用的な生活空間を創出します。"
+    },
+    {
+        "key": "contemporary_chinese",
+        "image": "",
+        "name": "現代中国風",
+        "description": "伝統的な中国スタイルと現代的なデザインコンセプトを組み合わせ、文化遺産と革新を反映します。"
+    },
+    {
+        "key": "contemporary_neoclassical",
+        "image": "",
+        "name": "現代新古典主義",
+        "description": "古典的な美学と現代デザインを融合させ、優雅さと贅沢を表現します。"
+    },
+    {
+        "key": "light_luxury",
+        "image": "",
+        "name": "ライトラグジュアリー",
+        "description": "高品質な素材とミニマリストデザインを強調し、控えめな贅沢なライフスタイルを作り出します。"
+    },
+    {
+        "key": "playful_fashion",
+        "image": "",
+        "name": "遊び心のあるファッション",
+        "description": "大胆な色彩とユニークなパターンを通じて、個性と創造性を表現します。"
+    },
+    {
+        "key": "traditional_eastern",
+        "image": "",
+        "name": "伝統的な東洋",
+        "description": "東洋文化の伝統的な美学を反映し、詳細と職人技に焦点を当てます。"
+    },
+    {
+        "key": "european_classical",
+        "image": "",
+        "name": "ヨーロッパ古典",
+        "description": "ヨーロッパ古典スタイルの優雅さと贅沢を融合させ、歴史の深みを表現します。"
+    },
+    {
+        "key": "leisure_vacation",
+        "image": "",
+        "name": "レジャー休暇",
+        "description": "快適でリラックスできる環境を作り出し、レジャーや休暇に最適です。"
+    },
+    {
+        "key": "japanese_style",
+        "image": "",
+        "name": "和風",
+        "description": "シンプルさ、自然、調和を強調し、伝統と現代のデザインコンセプトを融合させます。"
+    },
+    {
+        "key": "eclectic",
+        "image": "",
+        "name": "エクレクティック",
+        "description": "異なるスタイルや要素を組み合わせて、ユニークで個性的な空間を作り出します。"
+    }
+]

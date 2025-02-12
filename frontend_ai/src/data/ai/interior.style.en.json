@@ -1,0 +1,74 @@
+[
+    {
+        "key": "nordic_style",
+        "image": "",
+        "name": "Nordic Style",
+        "description": "Focuses on simplicity, nature, and functionality, emphasizing comfort and practicality."
+    },
+    {
+        "key": "contemporary_minimalism",
+        "image": "",
+        "name": "Contemporary Minimalism",
+        "description": "Emphasizes clean lines and functionality, creating a fresh and tranquil atmosphere."
+    },
+    {
+        "key": "modern_american",
+        "image": "",
+        "name": "Modern American",
+        "description": "Blends traditional and modern elements to create a comfortable and practical living space."
+    },
+    {
+        "key": "contemporary_chinese",
+        "image": "",
+        "name": "Contemporary Chinese",
+        "description": "Combines traditional Chinese styles with modern design concepts, reflecting cultural heritage and innovation."
+    },
+    {
+        "key": "contemporary_neoclassical",
+        "image": "",
+        "name": "Contemporary Neoclassical",
+        "description": "Merges classical aesthetics with modern design, showcasing elegance and luxury."
+    },
+    {
+        "key": "light_luxury",
+        "image": "",
+        "name": "Light Luxury",
+        "description": "Emphasizes high-quality materials and minimalist design, creating a low-key luxurious lifestyle."
+    },
+    {
+        "key": "playful_fashion",
+        "image": "",
+        "name": "Playful Fashion",
+        "description": "Showcases personality and creativity through bold colors and unique patterns."
+    },
+    {
+        "key": "traditional_eastern",
+        "image": "",
+        "name": "Traditional Eastern",
+        "description": "Reflects the traditional aesthetics of Eastern culture, focusing on details and craftsmanship."
+    },
+    {
+        "key": "european_classical",
+        "image": "",
+        "name": "European Classical",
+        "description": "Combines the elegance and luxury of European classical styles, showcasing historical depth."
+    },
+    {
+        "key": "leisure_vacation",
+        "image": "",
+        "name": "Leisure Vacation",
+        "description": "Creates a comfortable and relaxing environment, perfect for leisure and vacation."
+    },
+    {
+        "key": "japanese_style",
+        "image": "",
+        "name": "Japanese Style",
+        "description": "Emphasizes simplicity, nature, and harmony, blending traditional and modern design concepts."
+    },
+    {
+        "key": "eclectic",
+        "image": "",
+        "name": "Eclectic",
+        "description": "Combines different styles and elements to create a unique personalized space."
+    }
+]

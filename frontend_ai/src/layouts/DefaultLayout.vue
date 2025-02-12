@@ -1,0 +1,34 @@
+<script setup lang="ts">
+import MainSidebar from "@/components/navigation/MainSidebar.vue";
+import MainAppbar from "@/components/toolbar/MainAppbar.vue";
+
+import { useCustomizeThemeStore } from "@/stores/customizeTheme";
+const customizeTheme = useCustomizeThemeStore();
+</script>
+
+<template>
+  <v-layout>
+    <MainAppbar />
+    <MainSidebar />
+    <v-main class="main-container" v-touch="{
+      left: () => (customizeTheme.mainSidebar = false),
+      right: () => (customizeTheme.mainSidebar = true),
+    }">
+      <div class="flex-fill pa-1">
+        <slot></slot>
+      </div>
+    </v-main>
+  </v-layout>
+</template>
+
+<style scoped>
+.scrollnav {
+  height: calc(100vh - 326px);
+}
+
+.main-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+</style>

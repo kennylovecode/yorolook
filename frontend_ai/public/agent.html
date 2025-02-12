@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <!-- Do not delete start -->
+    <link rel="stylesheet" href="./main.css" />
+    <!-- Do not delete end -->
+  </head>
+  <body>  
+    <div id="id1" style="top: 0; left: 0;width: 100vw; height: 100vh"></div>
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.0.0-beta.4/libs/cn/index.js"></script>
+    <script>
+        //pina_AMA2GAQXAAS6EAYAGBAFGDMU6QUEHEYBQBIQC6SRXMTIABCUWGMDC3R4MOACVPE2DXPZU5NNB3AI4QBIXLJZKV2EVP6UBIIA
+        console.log(CozeWebSDK.WebChatClient)
+        const cozeWebSDK = new CozeWebSDK.WebChatClient({
+            config: {
+                // 智能体 ID
+                botId: '7437406737831444521',
+            },
+            auth:  {
+                //鉴权方式，默认type 为unauth，表示不鉴权；建议设置为 token，表示通过PAT或OAuth鉴权
+                type: 'token',    
+                //type 为 token 时，需要设置PAT或OAuth访问密钥
+                token: 'pat_rWtXcHMNAVhBZmzjKsCRvbJvKcJDw9lb8zBCOzIdP1k9TD9DEHLvpwtKKPC2UVct',
+                //访问密钥过期时，使用的新密钥，可以按需设置。
+                onRefreshToken: () => 'pat_rWtXcHMNAVhBZmzjKsCRvbJvKcJDw9lb8zBCOzIdP1k9TD9DEHLvpwtKKPC2UVct',
+            },
+            ui: {
+                chatBot: {
+                    title: "YORO AI 超级智能体",
+                    width: 800,
+                },
+                base: {
+                    icon: 'https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png',
+                    layout: 'pc',
+                    zIndex: 1000,
+                },
+                footer: {
+                    isShow: true,
+                    expressionText: 'Powered by {{name}}&{{name1}}',
+                    linkvars: {
+                        name: {
+                            text: 'YOROAI',
+                            link: 'https://ai.yorolook.com'
+                        },
+                        name1: {
+                            text: 'YOROLOOK',
+                            link: 'https://yorolook.com'
+                        }
+                        }
+                    }
+                },
+                asstBtn: {
+                    isNeed: false,
+                },
+        });
+        cozeWebSDK.showChatBot()
+    </script>
+  </body>
+</html>

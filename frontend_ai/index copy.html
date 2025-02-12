@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="/favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yoro AI 智能设计</title>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-WVWG4VLCL2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
+
+    gtag("config", "G-WVWG4VLCL2");
+  </script>
+  <link href="https://fonts.loli.net/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.0.0-beta.4/libs/cn/index.js"></script>
+  <style>
+    .bottom-0{
+        display: none !important
+    }
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: Arial, sans-serif;
+    }
+    #welcome-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #1a1a1a;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+    #welcome-content {
+        text-align: center;
+    }
+    #logo {
+        margin-bottom: 20px;
+    }
+    @keyframes letterBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    .letter {
+        display: inline-block;
+        font-size: 4em;
+        font-weight: bold;
+        color: #ffffff;
+        animation: letterBounce 1s infinite;
+    }
+    .progress-container {
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    #progress-bar {
+        width: 100%;
+        height: 4px;
+        background-color: #333;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    #progress {
+        width: 0;
+        height: 100%;
+        background-color: #4CAF50;
+        transition: width 5s linear;
+    }
+    .hidden {
+        display: none !important;
+    }
+</style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module" src="/src/main.ts"></script>
+  
+  <div id="welcome-screen" class="hidden">
+    <div id="welcome-content">
+        <div id="logo">
+            <span class="letter">Y</span>
+            <span class="letter">O</span>
+            <span class="letter">R</span>
+            <span class="letter">O</span>
+            <span class="letter">.</span>
+            <span class="letter">A</span>
+            <span class="letter">I</span>
+        </div>
+        <div class="progress-container">
+            <div id="progress-bar">
+                <div id="progress"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const letters = document.querySelectorAll('.letter');
+        const progress = document.getElementById('progress');
+
+        // 检查是否已经显示过欢迎屏幕
+        if (sessionStorage.getItem('welcomeScreenShown')) {
+            return; // 如果已显示过，直接返回
+        }
+
+        // 移除隐藏类，显示欢迎屏幕
+        welcomeScreen.classList.remove('hidden');
+
+        // 设置字母动画延迟
+        letters.forEach((letter, index) => {
+            letter.style.animationDelay = `${index * 0.1}s`;
+        });
+
+        // 开始进度条动画
+        setTimeout(() => {
+            progress.style.width = '100%';
+        }, 100);
+
+        // 5秒后隐藏欢迎屏幕
+        setTimeout(() => {
+            welcomeScreen.style.transition = 'opacity 0.5s';
+            welcomeScreen.style.opacity = '0';
+            setTimeout(() => {
+                welcomeScreen.classList.add('hidden');
+                // 设置会话存储，标记欢迎屏幕已显示
+                sessionStorage.setItem('welcomeScreenShown', 'true');
+                // 这里您可以初始化您的Vue 3应用
+                console.log('Welcome screen closed, Vue 3 app would start here');
+            }, 500);
+        }, 5000);
+    });
+</script>
+</body>
+<script>
+  
+</script>
+</html>
