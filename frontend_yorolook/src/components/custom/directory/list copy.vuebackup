@@ -1,0 +1,622 @@
+<style lang="scss" scoped>
+.directory-list {
+  width: 100%;
+  max-width: var(--max-width);
+  position: relative;
+  margin: 0 auto;
+
+  .header {
+    .title {
+      font-size: large;
+      margin: 1rem 0;
+    }
+    .search-type {
+      margin: 0.5rem 0;
+    }
+  }
+
+  .item {
+    .body {
+      padding-bottom: 8px;
+
+      .creation {
+        width: 100%;
+        padding-top: 100%;
+        position: relative;
+
+        .panel {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: dashed 1px #666;
+          color: #666;
+
+          span {
+            margin-left: 8px;
+          }
+        }
+      }
+    }
+  }
+
+  .cover {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 5px;
+
+    .el-image {
+      width: 50%;
+      aspect-ratio: 1/1;
+      padding: 3px;
+
+      .replace-block {
+        background: var(--el-fill-color-light);
+        font-size: 10px;
+      }
+    }
+  }
+
+  .files {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .icon {
+      padding: 1vw 0;
+
+      i {
+        font-size: 100pt;
+      }
+    }
+  }
+
+  .name {
+    text-align: center;
+    padding: 2px 8px;
+    font-size: 14px;
+    line-height: 26px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .keywords {
+    padding: 0 8px;
+    font-size: 12px;
+  }
+}
+</style>
+
+<template>
+  <div class="directory-list">
+    <filter-area :custom="true">
+      <template #prev>
+        <el-breadcrumb v-if="props.status != 255" :separator-icon="ArrowRight">
+          <el-breadcrumb-item :key="index" v-for="(item, index) in currentDirectory.stacks" @click="enterDir(item)">{{
+            item.title
+          }}</el-breadcrumb-item>
+          <el-breadcrumb-item v-if="currentDirectory.id" @click="enterDir(currentDirectory)"
+            >{{ currentDirectory.title }}
+            <span v-if="currentDirectory.dir_total > 0 || currentDirectory.file_total > 0">
+              （<template v-if="currentDirectory.dir_total > 0">{{ currentDirectory.dir_total }}个文件夹</template>
+              <em v-if="currentDirectory.dir_total > 0 && currentDirectory.file_total > 0">，</em>
+              <template v-if="currentDirectory.file_total > 0">{{ currentDirectory.file_total }}个文件</template>）
+            </span>
+          </el-breadcrumb-item>
+        </el-breadcrumb>
+        <!--Check All-->
+        <el-checkbox
+          :disabled="currentDirectory.files?.length <= 0"
+          style="margin-left: 8px"
+          @click="checkAll"
+          :indeterminate="isIndeterminate"
+          >全选</el-checkbox
+        >
+      </template>
+      <template #right>
+        <el-button
+          v-if="checkedList.length > 0"
+          v-permission="['manage', `owner_${currentDirectory.owner_uuid || props.owner_uuid}`]"
+          icon="Plus"
+          type="danger"
+          size="small"
+          @click="deleteChecked"
+          >删除选中</el-button
+        >
+        <el-button
+          v-if="checkedList.length > 0"
+          v-permission="['manage', `owner_${currentDirectory.owner_uuid || props.owner_uuid}`]"
+          icon="Plus"
+          type="primary"
+          size="small"
+          plain
+          @click="showMoveDialog"
+          >移动到目录</el-button
+        >
+        <el-button
+          v-permission="['manage', `owner_${currentDirectory.owner_uuid || props.owner_uuid}`]"
+          icon="Plus"
+          type="primary"
+          v-if="props.status != 255"
+          size="small"
+          plain
+          @click="$o.create = true"
+          >新建文件夹</el-button
+        >
+        <el-button
+          v-permission="['manage', `owner_${currentDirectory.owner_uuid || props.owner_uuid}`]"
+          icon="Plus"
+          type="primary"
+          v-if="props.status != 255"
+          size="small"
+          plain
+          @click="openUploadDrawer()"
+          >上传文件</el-button
+        >
+        <el-dropdown
+          v-if="props.status != 255"
+          trigger="click"
+          size="small"
+          style="margin-left: 1rem"
+          @command="sortCommand"
+        >
+          <el-button type="primary" size="small" plain>
+            {{ sortSelected.sortOption.label }}排序{{ sortSelected.sortType === "" ? "↑" : "↓" }}
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu class="sort-dropdown">
+              <el-dropdown-item v-for="action in sortOptions" :command="action.value"
+                ><span :class="{ active: sortSelected.sortOption.value === action.value }">{{
+                  action.label
+                }}</span></el-dropdown-item
+              >
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </template>
+    </filter-area>
+    <!-- Directory Page -->
+    <yl-masonry-list
+      :key="route.query + searchQuery.id + searchQuery.sort"
+      ref="listRef"
+      :load="load"
+      :cols="6"
+      :gap="8"
+      :step="20"
+    >
+      <template #item="{ item, index }">
+        <el-card shadow="always" :body-style="{ padding: '0' }">
+          <!-- Direcroty Card -->
+          <directory-card v-if="item['deep'] >= 0" :item="item" :index="index" />
+
+          <!-- File Card -->
+          <div v-else class="body" @click="previewFile(item)">
+            <div class="single-box">
+              <div class="preview" v-if="item.original_mime_type && item.original_mime_type.indexOf('image') === 0">
+                <el-image fit="contain" @load="imageLoad" :lazy="true" :src="`/disk/view?id=${item.id}&w=300`" />
+              </div>
+              <div class="files" v-else>
+                <div v-if="item.original_mime_type" class="icon">
+                  <i class="yorolook icon-document" />
+                </div>
+                <div v-else class="icon">
+                  <i class="yorolook icon-files" />
+                </div>
+              </div>
+            </div>
+            <div class="name">
+              <span>{{ item.title }}</span>
+            </div>
+            <div class="keywords">
+              {{ item.keywords }}
+            </div>
+          </div>
+          <operate-group
+            :can-favorite="item.status === 0"
+            :can-edit="item?.owner_uuid === accountInfo.id || accountInfo.manage"
+            :edit="
+              () => {
+                openEditDialog(item)
+              }
+            "
+            :star
+            :remove="
+              () => {
+                remove(item, index)
+              }
+            "
+          >
+            <template #left>
+              <el-checkbox
+                :key="checkedList.length"
+                v-if="item['original_mime_type']"
+                @click="checkItem(item)"
+                :checked="checkedList.indexOf(item.id) > -1"
+              />
+            </template>
+          </operate-group>
+        </el-card>
+      </template>
+    </yl-masonry-list>
+    <el-dialog v-model="$o.edit" width="50%" @close="">
+      <edit-form
+        :key="'dir_' + currentEditItem.id"
+        v-if="currentEditItem['deep'] >= 0"
+        :item="currentEditItem"
+        :name="props.channel"
+        :id="props.uuid"
+        ref="editFormRef"
+        :dialog="true"
+        :cb="editDialogCallback"
+      />
+      <file-edit
+        :key="'file_' + currentEditItem.id"
+        v-else
+        ref="editFormRef"
+        :dialog="true"
+        :cb="editDialogCallback"
+        :item="currentEditItem"
+      />
+    </el-dialog>
+  </div>
+  <el-drawer v-model="uploadDrawerVisible" title="上传文件" direction="rtl">
+    <div class="cover">
+      <el-upload
+        v-model:file-list="uploadFileList"
+        :headers="{ Authorization: 'Bearer ' + tokenInfo.accessToken }"
+        :on-success="onUploadSuccess"
+        multiple
+        action="/disk/upload"
+        list-type="picture"
+        :data="{ uuid: currentDirectory.id }"
+      >
+        <el-button type="primary">点击上传</el-button>
+        <template #tip>
+          <div class="el-upload__tip">jpg/png files with a size less than 500kb</div>
+        </template>
+      </el-upload>
+    </div>
+  </el-drawer>
+  <r-preview v-if="fileUrl" :key="fileUrl" :src="fileUrl" />
+  <el-dialog v-model="$o.create" title="创建新文件夹" width="375px">
+    <el-form>
+      <el-form-item label="文件夹名称">
+        <el-input v-model="newDirectoryTitle" autocomplete="off" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="$o.create = false">取消</el-button>
+        <el-button type="primary" @click="createDirectory"> 创建 </el-button>
+      </div>
+    </template>
+  </el-dialog>
+  <el-dialog v-model="$o.remove" title="删除目录" width="30%">
+    <el-text line-clamp="2"
+      >您发起了删除操作，当前选择的文件或文件夹将被删除进入回收站，您可以将其从回收站恢复，或从回收站中永久删除。</el-text
+    >
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="$o.remove = false">取消</el-button>
+        <el-button type="danger" @click="confirmRemove">删除</el-button>
+      </div>
+    </template>
+  </el-dialog>
+</template>
+
+<script setup lang="ts">
+import directoryCard from "./directory-card.vue"
+
+import { ArrowRight } from "@element-plus/icons-vue"
+import ylMasonryList from "@/components/custom/masonry-list.vue"
+import { getCurrentInstance, reactive, ref, withDefaults, h, onMounted, onUpdated } from "vue"
+import { BaseStruct, DirDetail, Directory, File as FileInfo, IListQuery } from "@/api/directory/types"
+import filterArea from "@/components/filter/filter-area.vue"
+import editForm from "./edit.vue"
+import fileEdit from "./file-edit.vue"
+import { useUserStore } from "@/store/modules/user"
+import operateGroup from "@/components/custom/operate-group.vue"
+import { ElMessageBox, UploadUserFile } from "element-plus"
+import { deleteById as deleteDirById, deleteFileById } from "@/api/directory/index"
+import { requestNoBase } from "@/utils/service"
+import "ranui/preview"
+import { getList, create } from "@/api/directory/index"
+import { useRoute, useRouter } from "vue-router"
+
+const props = withDefaults(
+  defineProps<{
+    channel?: string
+    id?: string
+    status?: number
+  }>(),
+  {
+    channel: "",
+    id: "",
+    status: 0
+  }
+)
+
+const app = getCurrentInstance()
+
+const $redrawVueMasonry = app?.appContext.config.globalProperties.$redrawVueMasonry
+
+const { accountInfo, tokenInfo, roles } = useUserStore()
+
+const $o = reactive<{
+  create: boolean
+  remove: boolean
+  removeItems: any[]
+  edit: boolean
+}>({
+  create: false,
+  remove: false,
+  removeItems: [],
+  edit: false
+})
+
+const newDirectoryTitle = ref("")
+const createDirectory = async () => {
+  const postForm = {
+    title: newDirectoryTitle.value,
+    parent_uuid: currentDirectory.value.id,
+    channel_relation: currentDirectory.value.channel_relation
+  }
+  const { data } = await create(postForm)
+  currentDirectory.value.dirs.splice(0, 0, data)
+  listRef.value.addItem(data)
+  newDirectoryTitle.value = ""
+  $o.create = false
+}
+
+const dirFinish = ref(false)
+const editFormRef = ref()
+const searchQuery = reactive<IListQuery>({
+  idx: 1,
+  size: 30,
+  sort: "display_order",
+  channel: "",
+  id: props.id,
+  status: props.status
+})
+
+const listRef = ref()
+const uploadDrawerVisible = ref(false)
+const uploadFileList = ref<UploadUserFile[]>([])
+const fileIndex = ref(1)
+
+const checkedList = ref<any[]>([])
+const isIndeterminate = ref(false)
+const checkItem = (item: any) => {
+  const index = checkedList.value.indexOf(item.id)
+  if (index > -1) {
+    checkedList.value.splice(index, 1)
+  } else {
+    checkedList.value.push(item.id)
+  }
+  isIndeterminate.value = checkedList.value.length > 0
+}
+const checkAll = () => {
+  if (checkedList.value.length === currentDirectory.value.files.length) {
+    checkedList.value = []
+  } else {
+    checkedList.value = currentDirectory.value.files.map((x) => x.id)
+  }
+  isIndeterminate.value = checkedList.value.length > 0 && checkedList.value.length < currentDirectory.value.files.length
+}
+
+const deleteChecked = async () => {
+  await checkedList.value.forEach(async (x) => {
+    await deleteFileById(x)
+  })
+}
+const showMoveDialog = () => {}
+
+const sortSelected = reactive<{
+  sortOption: {
+    label: string
+    value: string
+  }
+  sortType: "" | "-"
+}>({
+  sortOption: {
+    label: "按自定义",
+    value: "display_order"
+  },
+  sortType: ""
+})
+
+const fileUrl = ref("")
+
+const sortOptions = [
+  {
+    label: "按自定义",
+    value: "display_order"
+  },
+  {
+    label: "按更新时间",
+    value: "updated_at"
+  },
+  {
+    label: "按名称",
+    value: "title"
+  }
+]
+
+const sortCommand = (cmd: string) => {
+  if (sortSelected.sortOption.value === cmd) {
+    sortSelected.sortType = sortSelected.sortType ? "" : "-"
+  } else {
+    const option = sortOptions.find((o) => o.value === cmd)
+    if (!option) return
+    sortSelected.sortOption.label = option.label
+    sortSelected.sortOption.value = option.value
+    sortSelected.sortType = ""
+  }
+  searchQuery.idx = 1
+  fileIndex.value = 1
+  searchQuery.sort = `${sortSelected.sortType}${sortSelected.sortOption.value}`
+}
+
+/** 当前编辑 */
+const currentEditItem = ref<BaseStruct & any>({
+  id: "",
+  title: ""
+})
+/** 当前所在的目录 */
+const currentDirectory = ref<BaseStruct & Directory & DirDetail>({
+  id: "",
+  title: "",
+  files: [],
+  file_total: 0,
+  dirs: [],
+  dir_total: 0,
+  stacks: []
+})
+
+const load = async () => {
+  const { data } = await getList(searchQuery)
+  searchQuery.idx++
+  if (data) {
+    currentDirectory.value = data
+  }
+  dirFinish.value = data.dir_total + data.file_total < searchQuery.size * searchQuery.idx
+  return [...data.dirs, ...data.files]
+}
+
+const route = useRoute()
+const router = useRouter()
+const emits = defineEmits(["enter-dir"])
+const enterDir = async (item?: BaseStruct & Directory) => {
+  if (item?.status === 255) return
+  if (!item) {
+    const newQuery: any = {}
+    await router.push({ path: route.path, query: newQuery })
+    location.reload()
+    return
+  }
+  /** client permission check */
+  const isOwner = item?.owner_uuid === accountInfo.id
+  const isManage = roles.indexOf("manage") >= 0
+  if (!isOwner && !isManage && item?.point_payment_limit && item?.point_payment_limit > 0) {
+    ElMessageBox.alert(`查看该目录需要支付${item?.point_payment_limit}阳光值，请问是否继续?`, "提示", {})
+    return
+  }
+  searchQuery.id = item?.id
+  const newQuery: any = {}
+  newQuery.paths = item?.layer_tree ? `${item?.layer_tree}${item?.id}` : item?.id
+  await router.push({ path: route.path, query: newQuery })
+  emits("enter-dir", item?.layer_tree ? `${item?.layer_tree}${item?.id}` : item?.id)
+}
+const previewFile = async (item: BaseStruct & FileInfo) => {
+  /** client permission check */
+  const isOwner = item?.owner_uuid === accountInfo.id
+  const isManage = roles.indexOf("manage") >= 0
+  if (!isOwner && !isManage && item?.point_payment_limit && item?.point_payment_limit > 0) {
+    ElMessageBox.alert(`查看该目录需要支付${item?.point_payment_limit}阳光值，请问是否继续?`, "提示", {})
+    return
+  }
+
+  const method1Options = [
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/pdf"
+  ]
+  if (item.original_mime_type?.indexOf("image/") === 0) listRef.value?.previewOpen(item.id)
+  else if (method1Options.indexOf(item.original_mime_type as string) > -1) {
+    // 从服务器读取流
+    const response = await requestNoBase<any>({
+      url: `/disk/fileview?id=${item.id}`,
+      responseType: "blob"
+    })
+    fileUrl.value = URL.createObjectURL(response)
+  }
+}
+
+const downloadFile = async (item: BaseStruct & FileInfo) => {
+  /** client permission check */
+  const isOwner = item?.owner_uuid === accountInfo.id
+  const isManage = roles.indexOf("manage") >= 0
+  if (!isOwner && !isManage && item?.point_payment_limit && item?.point_payment_limit > 0) {
+    ElMessageBox.alert(`查看该目录需要支付${item?.point_payment_limit}阳光值，请问是否继续?`, "提示", {})
+    return
+  }
+}
+
+const imageLoad = () => {
+  $redrawVueMasonry()
+}
+
+const openEditDialog = (item?: BaseStruct & Directory) => {
+  /** 初始化编辑对象 */
+  currentEditItem.value = item
+  $o.edit = true
+}
+
+const openUploadDrawer = () => {
+  if (currentDirectory.value.id) {
+    uploadDrawerVisible.value = true
+    return
+  }
+
+  ElMessageBox.alert("不允许在根目录直接上传文件，请选择一个文件夹进行上传。", "系统拒绝", {
+    confirmButtonText: "关闭"
+  })
+}
+
+const editDialogCallback = (item: BaseStruct & any) => {
+  $o.edit = true
+  if (currentEditItem.value.id === item.id) listRef.value.replaceItem(item)
+  else listRef.value.addItem(item)
+}
+const onUploadSuccess = (response: any) => {
+  listRef.value.addItem(response)
+}
+
+const remove = (item: any, index: number) => {
+  $o.remove = true
+  $o.removeItems.push({
+    id: item.id,
+    type: item.original_mime_type ? "file" : "dir",
+    index
+  })
+}
+const confirmRemove = () => {
+  const loading = ElLoading.service({
+    lock: true,
+    text: "正在删除...",
+    spinner: "el-icon-loading",
+    background: "rgba(0, 0, 0, 0.7)"
+  })
+  if ($o.removeItems.length) {
+    $o.removeItems.forEach(async (item: any) => {
+      const delMethod = item.type === "dir" ? deleteDirById : deleteFileById
+      await delMethod(item.id, true)
+      listRef.value.removeItem(item.index)
+    })
+    $o.removeItems = []
+    $o.remove = false
+    ElMessage({
+      type: "success",
+      message: `操作: 删除成功 ...`
+    })
+  }
+  loading.close()
+}
+const star = () => {}
+
+const init = () => {
+  const paths = route.query.paths as string
+  if (paths) {
+    searchQuery.id = paths.split(",").pop()
+    searchQuery.idx = 1
+  }
+}
+
+onUpdated(init)
+onMounted(init)
+</script>

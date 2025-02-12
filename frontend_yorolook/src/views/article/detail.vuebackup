@@ -1,0 +1,315 @@
+<style lang="scss" scoped>
+.app-container {
+  width: 100%;
+  padding: 0 1rem;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  position: relative;
+  .publish-header {
+    background-color: var(--el-fill-color);
+    margin: 80px 0 20px 0;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .left {
+      display: flex;
+      width: 60%;
+      align-items: center;
+      .title {
+        font-size: 20px;
+        margin-left: 1rem;
+      }
+      .keywords {
+        .el-tag {
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+
+  .base-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    .detail-info {
+      width: 100%;
+      .title-tabs {
+        width: 100%;
+        position: relative;
+        &.sticky {
+          position: fixed;
+          top: 0;
+          left: 0;
+          background: var(--el-bg-color);
+          z-index: 1004;
+        }
+        > div {
+          width: 100%;
+          border-bottom: 1px solid #f0f3f5;
+          > div {
+            display: flex;
+            align-items: center;
+            color: var(--el-text-color-secondary);
+            height: 64px;
+            width: 100%;
+            max-width: var(--max-width);
+            margin: 0 auto;
+          }
+          .tab {
+            margin-right: 32px;
+            position: relative;
+            &.active {
+              color: var(--el-color-primary);
+              &::after {
+                content: "";
+                display: inline-block;
+                width: 100%;
+                height: 2px;
+                background-color: var(--el-color-primary);
+                position: absolute;
+                left: 0;
+                bottom: -24px;
+              }
+            }
+          }
+        }
+      }
+      .detail-wrap {
+        margin-top: 20px;
+        padding-top: 40px;
+        width: 60%;
+        padding-bottom: 100px;
+        .mo {
+          margin-top: 60px;
+          .title {
+            font-weight: 600;
+            font-size: 20px;
+            line-height: 20px;
+            color: var(--el-text-color-primary);
+            margin-bottom: 16px;
+          }
+
+          .description-container {
+            .item {
+              img {
+                display: block;
+              }
+            }
+          }
+        }
+      }
+
+      .list-wrap {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        .sku-item {
+          width: calc((100% - 32px) / 4);
+          margin-top: 8px;
+          &:nth-child(4n + 1) {
+            margin-left: 0;
+          }
+        }
+      }
+    }
+  }
+}
+@media screen and (max-width: 750px) {
+  .app-container {
+    .base-content {
+      .detail-info {
+        width: 100%;
+        .detail-wrap {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+@media screen and (min-width: 1024px) {
+}
+@media screen and (min-width: 1280px) {
+}
+@media screen and (min-width: 1440px) {
+}
+.affix-target {
+  margin-top: 100px;
+}
+</style>
+<template>
+  <div class="app-container">
+    <div class="publish-header">
+      <div class="left">
+        <div class="logo">
+          <el-avatar
+            icon="el-icon-user-solid"
+            :size="48"
+            shape="circle"
+            src="https://gw.alicdn.com/imgextra/i4/4005062145/O1CN01cJ1I0z1RiSJP76etv_!!4005062145-0-shopmanager.jpg_110x10000q50.jpg_.webp"
+            fit="fill"
+          />
+        </div>
+        <div class="title">
+          <span>{{ supplierModel.title }}</span>
+          <span>{{ supplierModel.level }}</span>
+        </div>
+        <div class="keywords">
+          <el-tag type="info" size="small" effect="dark" :key="item" v-for="item in 3" plain
+            >服务指标 {{ item }}</el-tag
+          >
+        </div>
+      </div>
+      <div class="right">
+        <el-button type="primary" size="default" plain>TA的主页</el-button>
+        <el-button type="primary" size="default" plain>TA的网站</el-button>
+        <el-button type="primary" size="default">关注TA</el-button>
+      </div>
+    </div>
+
+    <div class="base-content">
+      <image-gallery />
+      <purchase-panel v-affix="{ threshold: 0, class: ['affix'], target: '.affix-target', mixin: '.affix-target' }" />
+    </div>
+    <div :key="route.hash" class="base-content affix-target">
+      <div class="detail-info">
+        <div class="title-tabs" :class="{ sticky: tabSticky }">
+          <div>
+            <div>
+              <div
+                class="tab"
+                @click="goAnchor('#attribute-area')"
+                :class="{ active: activeTab === '#attribute-area' }"
+              >
+                参数信息
+              </div>
+              <div
+                class="tab"
+                @click="goAnchor('#recommend-area')"
+                :class="{ active: activeTab === '#recommend-area' }"
+              >
+                同款推荐
+              </div>
+              <div class="tab" @click="goAnchor('#info-area')" :class="{ active: activeTab === '#info-area' }">
+                商品详情
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="detail-wrap">
+          <div
+            class="mo"
+            id="attribute-area"
+            v-affix="{ threshold: 0.1, handle: { do: doTabSelected, undo: undoTabSelected } }"
+          >
+            <p class="title">参数信息</p>
+            <attribute-table />
+          </div>
+          <div
+            class="mo"
+            id="recommend-area"
+            v-affix="{ threshold: 0.1, handle: { do: doTabSelected, undo: undoTabSelected } }"
+          >
+            <p class="title">推荐好物</p>
+            <div class="list-wrap">
+              <article-item v-for="(item, index) in 10" :key="index" />
+            </div>
+          </div>
+          <div
+            class="mo"
+            id="info-area"
+            v-affix="{ threshold: 0.1, handle: { do: doTabSelected, undo: undoTabSelected } }"
+          >
+            <p class="title">商品详情</p>
+            <div class="description-container">
+              <div class="item">
+                <img
+                  src="https://img.alicdn.com/imgextra/i1/1697747196/O1CN01xuWaW3231p3bqLthA_!!1697747196.jpg"
+                  alt=""
+                />
+              </div>
+              <div class="item">
+                <img
+                  src="https://img.alicdn.com/imgextra/i4/1697747196/O1CN01Q5boet231p3VQXHSQ_!!1697747196.jpg"
+                  alt=""
+                />
+              </div>
+              <div class="item">
+                <img
+                  src="https://img.alicdn.com/imgextra/i1/1697747196/O1CN01xuWaW3231p3bqLthA_!!1697747196.jpg"
+                  alt=""
+                />
+              </div>
+              <div class="item">
+                <img
+                  src="https://img.alicdn.com/imgextra/i4/1697747196/O1CN01Q5boet231p3VQXHSQ_!!1697747196.jpg"
+                  alt=""
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, watch } from "vue"
+import attributeTable from "@/components/custom/article/attribute-table.vue"
+import imageGallery from "@/components/custom/image-gallery.vue"
+import purchasePanel from "./components/purchase-panel.vue"
+import { useRoute, useRouter } from "vue-router"
+import { useAppStore } from "@/store/modules/app"
+import articleItem from "@/components/custom/article/item-card.vue"
+
+const router = useRouter()
+const route = useRoute()
+const activeTab = ref<string>("#attribute-area")
+const tabSticky = ref<boolean>(false)
+
+const { toggleHeader } = useAppStore()
+
+const supplierModel = ref<any>({
+  title: "林氏木业",
+  logo: "",
+  level: 5,
+  keywords: "商品质量高,价格优惠,折扣政策好"
+})
+
+const doTabSelected = (el: HTMLElement) => {
+  activeTab.value = "#" + el.id
+}
+const undoTabSelected = (el: HTMLElement) => {
+  // activeTab.value = ''
+}
+
+const goAnchor = (id: string) => {
+  activeTab.value = id
+  const el = document.querySelector(activeTab.value)
+  window.scrollTo({
+    top: el?.offsetTop - 80
+  })
+}
+
+onMounted(() => {
+  //tagsViewStore.editTagTitle(route, "在Join表的时候使用相当类型的例，并将其索引")
+  activeTab.value = route.hash
+
+  const el = document.querySelector(".title-tabs")
+  document.addEventListener("scroll", (event) => {
+    if (document.documentElement.scrollTop > el.offsetTop) {
+      if (!tabSticky.value) {
+        tabSticky.value = true
+        toggleHeader(!tabSticky.value)
+      }
+    } else {
+      if (tabSticky.value) {
+        tabSticky.value = false
+        toggleHeader(!tabSticky.value)
+      }
+    }
+  })
+})
+</script>

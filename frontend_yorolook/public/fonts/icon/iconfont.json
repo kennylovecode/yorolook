@@ -1,0 +1,72 @@
+{
+  "id": "3875629",
+  "name": "yorolook",
+  "font_family": "yorolook",
+  "css_prefix_text": "icon-",
+  "description": "yorolook",
+  "glyphs": [
+    {
+      "icon_id": "19397521",
+      "name": "XLS图标",
+      "font_class": "XLStubiao",
+      "unicode": "e6c5",
+      "unicode_decimal": 59077
+    },
+    {
+      "icon_id": "5560705",
+      "name": "document",
+      "font_class": "document",
+      "unicode": "e75d",
+      "unicode_decimal": 59229
+    },
+    {
+      "icon_id": "6233080",
+      "name": "DOC图标",
+      "font_class": "DOCtubiao",
+      "unicode": "e63c",
+      "unicode_decimal": 58940
+    },
+    {
+      "icon_id": "6233085",
+      "name": "PDF图标",
+      "font_class": "PDFtubiao",
+      "unicode": "e63f",
+      "unicode_decimal": 58943
+    },
+    {
+      "icon_id": "6233087",
+      "name": "PPT图标",
+      "font_class": "PPTtubiao",
+      "unicode": "e640",
+      "unicode_decimal": 58944
+    },
+    {
+      "icon_id": "6802142",
+      "name": "Player-2",
+      "font_class": "Player-",
+      "unicode": "e72e",
+      "unicode_decimal": 59182
+    },
+    {
+      "icon_id": "10343173",
+      "name": "Files",
+      "font_class": "Files",
+      "unicode": "e756",
+      "unicode_decimal": 59222
+    },
+    {
+      "icon_id": "11797202",
+      "name": "rar",
+      "font_class": "rar",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "16300277",
+      "name": "cad",
+      "font_class": "cad",
+      "unicode": "e680",
+      "unicode_decimal": 59008
+    }
+  ]
+}
